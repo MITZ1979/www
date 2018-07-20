@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	</head>
+	<body>
+	<form enctype="multipart/form-data" action="/index.php">
+	 <li><span>版本上传：</span>
+             <img id="tempimg" dynsrc="" src="" style="display:none" />  
+             <input type="file" id="file" name="file" ></li>
+            <li><span>备注：</span><input type="text" id="description" name="description" ></li>
+
+          </ul>
+<!--           document.add.submit() -->
+          <div class="submit">
+              <a href="javascript:;" class="tijiao" onclick="checkfile()">保 存</a>
+              <a href="javascript:history.go(-1);" class="fanhui">返 回</a>
+			  </div>
+				<input type="submit" name="submit" value="提交你" />
+	</form>
+<script>
+            var maxsize = 20*1024*1024;//2M  
+     var errMsg = "上传的附件文件不能超过20M！！！";  
+     var tipMsg = "您的浏览器暂不支持计算上传文件的大小，确保上传文件不要超过2M，建议使用IE、FireFox、Chrome浏览器。";  
+     var  browserCfg = {};  
+     var ua = window.navigator.userAgent;  
+     if (ua.indexOf("MSIE")>=1){  
+         browserCfg.ie = true;  
+     }else if(ua.indexOf("Firefox")>=1){  
+         browserCfg.firefox = true;  
+     }else if(ua.indexOf("Chrome")>=1){  
+         browserCfg.chrome = true;  
+     }  
+     function checkfile(){  
+         try{  
+             var obj_file = document.getElementById("file");  
+             if(obj_file.value==""){  
+                 alert("请先选择上传文件");  
+                 return;  
+             }  
+             var filesize = 0;  
+             if(browserCfg.firefox || browserCfg.chrome ){  
+                 filesize = obj_file.files[0].size;  
+             }else if(browserCfg.ie){  
+                 var obj_img = document.getElementById('tempimg');  
+                 obj_img.dynsrc=obj_file.value;  
+                 filesize = obj_img.fileSize;  
+             }else{  
+                 alert(tipMsg);  
+             return;  
+             }  
+             if(filesize==-1){  
+                 alert(tipMsg);  
+                 return;  
+             }else if(filesize>maxsize){  
+                 alert(errMsg);  
+                 return;  
+             }else{  
+                // alert("文件大小符合要求");  
+                //alert("函数"); 
+                    var version = document.getElementById("version").value; //版本
+                    var type = $('#type option:selected').val(); //接口类型
+                    var saltkey = document.getElementById("saltkey").value; //saltkey
+                    var deviceType = $('#deviceType option:selected').val(); //设备类型
+                    var appType = $('#appType option:selected').val(); //app类型
+                    var description=document.getElementById("description").value; //备注
+
+                    $.ajaxFileUpload({
+                        url:ctx + '/backVersionManager/add.do?version='+version+'&type='+type+'&saltkey='+saltkey+'&deviceType='+deviceType+'&appType='+appType+'&description='+description,
+                        secureuri:false,
+                        //data:{"version":version,"type":type,"saltkey":saltkey,"deviceType":deviceType,"appType":appType,"description":description},
+                        fileElementId:'file',
+                        dataType:'text',  
+                        success:function(data,status){
+                            data = data.replace("<PRE>", '');  //ajaxFileUpload会对服务器响应回来的text内容加上<pre>text</pre>前后缀
+                            data = data.replace("</PRE>", '');
+                            data = data.replace("<pre>","");   
+                            data = data.replace("</pre>","");
+                          if(data== "上传成功！"){
+
+                            alert("上传成功！"); 
+                            window.location.href =  ctx+"/backVersionManager/query.do";
+
+                          }else if(data=="请选择文件后上传！"){
+                            alert("请选择文件后上传！");
+                          }else{
+                            alert("上传失败，请重试！");
+                          } 
+                        },
+                        error:function(data,status,e){  //服务器响应失败时的处理函数  
+                            alert("上传失败，请重试！");
+                        }
+                    })
+                 return;  
+             }  
+         }catch(e){  
+             alert(e);  
+         }  
+     }
+</script>
+	</body>
+</html>

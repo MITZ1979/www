@@ -1,0 +1,10 @@
+<?php
+/**
+	数据库连接文件
+*/
+
+
+$tmppath = substr(__FILE__,0, 23); //substr 截取字符取字符串长度，有复数和整数，整数从前取负数从最后一个字符串取
+$newpath=$tmppath."db\db_meeting.mdb";
+include "adodb/adodb.inc.php";
+$conn=ADONewConnection(''access);
